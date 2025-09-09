@@ -1,0 +1,113 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build outputs
+dist/
+build/
+dist-ssr/
+*.local
+
+# Environment files - SECURITY SENSITIVE
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+.env.backup*
+
+# IDE and Editor files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Logs
+logs/
+*.log
+
+# Runtime and temporary files
+*.pid
+*.seed
+*.pid.lock
+tmp/
+temp/
+
+# Coverage and test outputs
+coverage/
+*.lcov
+.nyc_output
+test-results/
+playwright-report/
+
+# Cache directories
+.npm
+.eslintcache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+.cache
+.parcel-cache
+
+# Optional files
+.node_repl_history
+*.tgz
+.yarn-integrity
+
+# Azure and Microsoft specific
+.azure/
+*.publishsettings
+*.kusto
+
+# Security - API keys and secrets
+secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+config/production.json
+config/local.json
+
+# Teams app package and manifest
+*.zip
+manifest/
+
+# Development utilities and demos
+quick-test.js
+test-server.html
+
+# Backup files
+*.backup
+
+# Jupyter notebooks
+.ipynb_checkpoints
+
+# MacOS specific
+.AppleDouble
+.LSOverride
+
+# Linux specific
+*~

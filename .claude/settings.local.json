@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod:*)",
+      "Bash(cp:*)",
+      "Bash(npm install)",
+      "Bash(npm run dev:*)",
+      "Bash(open https://localhost:3000)",
+      "Bash(curl:*)",
+      "Bash(lsof:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(timeout 10s npm run dev)",
+      "Bash(node:*)",
+      "Bash(echo \"│ | where timestamp >= ago(24h)                                │\")",
+      "Bash(./scripts/deploy-test-env.sh:*)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(git init:*)",
+      "Bash(git branch:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.16",
+  "version": "1.0.0",
+  "id": "corvus-adx-query-app",
+  "packageName": "com.corvus.adx-query",
+  "developer": {
+    "name": "Corvus Data Solutions",
+    "websiteUrl": "https://example.com",
+    "privacyUrl": "https://example.com/privacy",
+    "termsOfUseUrl": "https://example.com/terms"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "Corvus ADX Query",
+    "full": "Corvus Azure Data Explorer Query Tool"
+  },
+  "description": {
+    "short": "Query Azure Data Explorer with natural language",
+    "full": "A powerful tool that allows you to query your Azure Data Explorer database using natural language and visualize the results with interactive charts and graphs."
+  },
+  "accentColor": "#464775",
+  "bots": [],
+  "composeExtensions": [],
+  "configurableTabs": [],
+  "staticTabs": [
+    {
+      "entityId": "index",
+      "name": "ADX Query",
+      "contentUrl": "https://localhost:3000",
+      "websiteUrl": "https://localhost:3000",
+      "scopes": ["personal"]
+    }
+  ],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "localhost:3000",
+    "*.azurewebsites.net"
+  ],
+  "webApplicationInfo": {
+    "id": "your-azure-app-id-here",
+    "resource": "https://graph.microsoft.com/"
+  }
+}
