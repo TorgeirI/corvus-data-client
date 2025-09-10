@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced KQL Mock Database Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f2f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .test-section { background: white; margin: 20px 0; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .query-box { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; border-left: 4px solid #007bff; }
+        .result-box { background: #e9f7ef; padding: 15px; border-radius: 5px; margin: 10px 0; max-height: 300px; overflow-y: auto; }
+        .error-box { background: #ffeaa7; padding: 15px; border-radius: 5px; margin: 10px 0; border-left: 4px solid #e17055; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        .success { color: #00b894; font-weight: bold; }
+        .header { text-align: center; color: #2d3436; }
+        .description { color: #636e72; margin-bottom: 20px; }
+        pre { background: #2d3436; color: #ddd; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .loading { color: #0984e3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">🚢 Enhanced KQL Mock Database Test</h1>
+        <p class="description">
+            This page tests the enhanced mock ADX database with sophisticated KQL query processing.
+            The system now supports complex KQL operations including JOINs, aggregations, and multi-table queries.
+        </p>
+
+        <div class="test-section">
+            <h2>📊 Available Mock Tables</h2>
+            <div id="tables-info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Test Queries</h2>
+            <p>Click any query to execute it against the enhanced mock database:</p>
+            
+            <div class="query-box">
+                <h3>1. Basic Battery Data Query</h3>
+                <button onclick="runTestQuery('BatteryReadings | where timestamp >= ago(24h) | top 10 by timestamp desc')">
+                    Run: Recent Battery Readings
+                </button>
+            </div>
+
+            <div class="query-box">
+                <h3>2. Advanced Aggregation Query</h3>
+                <button onclick="runTestQuery('BatteryReadings | where timestamp >= ago(7d) | summarize avg(voltage), avg(temperature), dcount(vesselId) by vesselType')">
+                    Run: Fleet Statistics by Vessel Type
+                </button>
+            </div>
+
+            <div class="query-box">
+                <h3>3. Time-Based Aggregation with Binning</h3>
+                <button onclick="runTestQuery('BatteryReadings | where timestamp >= ago(48h) | summarize avg(stateOfCharge), avg(batteryHealth) by bin(timestamp, 6h), vesselName | top 20 by timestamp desc')">
+                    Run: 6-Hour Battery Health Trends
+                </button>
+            </div>
+
+            <div class="query-box">
+                <h3>4. Multi-Table JOIN Query</h3>
+                <button onclick="runTestQuery('BatteryReadings | join VesselMaintenance on vesselId | where batteryHealth < 85 and status == \"pending\" | project vesselName, batteryHealth, maintenanceType, priority')">
+                    Run: Vessels with Low Battery Health and Pending Maintenance
+                </button>
+            </div>
+
+            <div class="query-box">
+                <h3>5. Complex WHERE Clause</h3>
+                <button onclick="runTestQuery('AlertsAndEvents | where eventType == \"alert\" and severity in (\"high\", \"critical\") and not resolved | project vesselName, eventType, severity, message, timestamp | top 10 by timestamp desc')">
+                    Run: Unresolved Critical Alerts
+                </button>
+            </div>
+
+            <div class="query-box">
+                <h3>6. Weather Data Analysis</h3>
+                <button onclick="runTestQuery('WeatherData | where timestamp >= ago(24h) and (windSpeed > 20 or waveHeight > 2.5) | summarize avg(windSpeed), max(waveHeight), avg(airTemperature) by bin(timestamp, 3h)')">
+                    Run: Rough Weather Conditions
+                </button>
+            </div>
+
+            <div class="query-box">
+                <h3>7. Navigation and Fuel Analysis</h3>
+                <button onclick="runTestQuery('NavigationData | where timestamp >= ago(12h) | summarize avg(speed), avg(fuelConsumption), dcount(routeId) by vesselName | order by avg_fuelConsumption desc')">
+                    Run: Vessel Performance Metrics
+                </button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📈 Query Results</h2>
+            <div id="query-status"></div>
+            <div id="query-results"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the mock data service for testing
+        import { mockDataService } from './src/services/mockDataService.js';
+        
+        window.mockDataService = mockDataService;
+        
+        // Load table information
+        loadTableInfo();
+        
+        async function loadTableInfo() {
+            try {
+                const schema = await mockDataService.getMockSchema();
+                const tablesDiv = document.getElementById('tables-info');
+                
+                let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">';
+                
+                schema.forEach(table => {
+                    html += `
+                        <div style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; background: #f9f9f9;">
+                            <h4 style="margin-top: 0; color: #2d3436;">${table.tableName}</h4>
+                            <div style="font-size: 0.9em; color: #636e72;">
+                                <strong>Columns:</strong> ${table.columns.length}<br>
+                                <em>Key fields:</em> ${table.columns.slice(0, 3).map(c => c.name).join(', ')}...
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                tablesDiv.innerHTML = html;
+            } catch (error) {
+                document.getElementById('tables-info').innerHTML = `<div class="error-box">Error loading table info: ${error.message}</div>`;
+            }
+        }
+        
+        window.runTestQuery = async function(kqlQuery) {
+            const statusDiv = document.getElementById('query-status');
+            const resultsDiv = document.getElementById('query-results');
+            
+            statusDiv.innerHTML = `<div class="loading">🔄 Executing KQL Query...</div>`;
+            resultsDiv.innerHTML = '';
+            
+            try {
+                const startTime = Date.now();
+                const results = await mockDataService.executeKQLQuery(kqlQuery);
+                const executionTime = Date.now() - startTime;
+                
+                statusDiv.innerHTML = `<div class="success">✅ Query executed successfully in ${executionTime}ms</div>`;
+                
+                let html = `
+                    <div class="result-box">
+                        <h4>Query:</h4>
+                        <pre>${kqlQuery}</pre>
+                        <h4>Results (${results.length} rows):</h4>
+                `;
+                
+                if (results.length > 0) {
+                    // Create a simple table view
+                    const columns = Object.keys(results[0]);
+                    html += '<table style="width: 100%; border-collapse: collapse; margin: 10px 0;">';
+                    html += '<thead><tr>';
+                    columns.forEach(col => {
+                        html += `<th style="border: 1px solid #ddd; padding: 8px; background: #f1f3f4;">${col}</th>`;
+                    });
+                    html += '</tr></thead><tbody>';
+                    
+                    results.slice(0, 10).forEach(row => { // Show first 10 rows
+                        html += '<tr>';
+                        columns.forEach(col => {
+                            let value = row[col];
+                            if (value instanceof Date) {
+                                value = value.toISOString();
+                            } else if (typeof value === 'number') {
+                                value = Number(value).toFixed(2);
+                            }
+                            html += `<td style="border: 1px solid #ddd; padding: 8px;">${value || '—'}</td>`;
+                        });
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table>';
+                    
+                    if (results.length > 10) {
+                        html += `<p><em>Showing first 10 of ${results.length} rows</em></p>`;
+                    }
+                } else {
+                    html += '<p><em>No results found</em></p>';
+                }
+                
+                html += '</div>';
+                resultsDiv.innerHTML = html;
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error-box">❌ Query failed: ${error.message}</div>`;
+                resultsDiv.innerHTML = '';
+                console.error('Query error:', error);
+            }
+        };
+    </script>
+</body>
+</html>

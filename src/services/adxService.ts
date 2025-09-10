@@ -122,19 +122,32 @@ class ADXService {
   }
 
   private async parseMockQuery(kqlQuery: string): Promise<any[]> {
+    const query = kqlQuery.trim()
+    
+    // Handle simple print statements for connection testing
+    if (query.toLowerCase().includes('print')) {
+      return [{ Result: 'Connection test successful' }]
+    }
+
+    // Use the enhanced mock data service for KQL query processing
+    try {
+      return await mockDataService.executeKQLQuery(kqlQuery)
+    } catch (error) {
+      console.error('Enhanced KQL parsing error:', error)
+      // Fallback to simple parsing
+      return await this.executeSimpleQuery(query)
+    }
+  }
+
+  private async executeSimpleQuery(kqlQuery: string): Promise<any[]> {
     const query = kqlQuery.toLowerCase().trim()
     
-    // Simple query parsing for common patterns
     if (query.includes('batteryreadings')) {
-      return this.generateBatteryData(kqlQuery)
+      return await this.generateBatteryData(kqlQuery)
     } else if (query.includes('vesselinfo')) {
       return this.generateVesselData()
-    } else if (query.includes('print')) {
-      // Handle simple print statements for connection testing
-      return [{ Result: 'Connection test successful' }]
     } else {
-      // Default to battery readings
-      return this.generateBatteryData(kqlQuery)
+      return await this.generateBatteryData(kqlQuery)
     }
   }
 

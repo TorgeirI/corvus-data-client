@@ -20,14 +20,17 @@ class NLToKQLService {
 
   constructor() {
     const apiKey = import.meta.env.VITE_OPENAI_API_KEY
-    if (!apiKey) {
-      throw new Error('OpenAI API key not configured')
+    
+    // Only initialize OpenAI if we have a real API key (not placeholder)
+    if (apiKey && apiKey !== 'your-openai-api-key-here') {
+      this.openai = new OpenAI({
+        apiKey,
+        dangerouslyAllowBrowser: true
+      })
+    } else {
+      console.warn('OpenAI API key not configured. Using fallback KQL generation for testing.')
+      this.openai = null as any // Will use fallback methods
     }
-
-    this.openai = new OpenAI({
-      apiKey,
-      dangerouslyAllowBrowser: true
-    })
   }
 
   async loadSchemaContext(): Promise<void> {
@@ -100,6 +103,11 @@ ${additionalContext}
       await this.loadSchemaContext()
     }
 
+    // If OpenAI is not available, use fallback method
+    if (!this.openai) {
+      return this.generateFallbackKQL(naturalLanguageQuery)
+    }
+
     const systemPrompt = `You are an expert in Kusto Query Language (KQL) for Azure Data Explorer. 
 Your task is to convert natural language queries into valid KQL queries.
 
@@ -154,7 +162,129 @@ Only return valid JSON, no additional text.`
       }
     } catch (error) {
       console.error('OpenAI API call failed:', error)
-      throw new Error('Failed to convert natural language to KQL')
+      // Fall back to pattern-based generation if OpenAI fails
+      return this.generateFallbackKQL(naturalLanguageQuery)
+    }
+  }
+
+  private generateFallbackKQL(naturalLanguageQuery: string): KQLConversionResult {
+    const query = naturalLanguageQuery.toLowerCase().trim()
+    
+    // Pattern-based KQL generation for common maritime vessel queries
+    let kqlQuery = 'BatteryReadings'
+    let explanation = 'Query vessel battery data'
+    const suggestedVisualizations = ['table', 'line']
+    
+    // Time range detection
+    if (query.includes('last 24 hours') || query.includes('yesterday')) {
+      kqlQuery += '\n| where timestamp >= ago(24h)'
+      explanation += ' from the last 24 hours'
+    } else if (query.includes('last week') || query.includes('7 days')) {
+      kqlQuery += '\n| where timestamp >= ago(7d)'
+      explanation += ' from the last week'
+    } else if (query.includes('today')) {
+      kqlQuery += '\n| where timestamp >= startofday(now())'
+      explanation += ' from today'
+    }
+
+    // Vessel-specific filters
+    if (query.includes('vessel')) {
+      const vesselMatch = query.match(/vessel\s+(\w+)/i)
+      if (vesselMatch) {
+        kqlQuery += `\n| where vesselName contains "${vesselMatch[1]}"`
+        explanation += ` for vessels containing "${vesselMatch[1]}"`
+      }
+    }
+
+    // Battery health filters
+    if (query.includes('low battery') || query.includes('battery health')) {
+      if (query.includes('below') || query.includes('less than')) {
+        const numberMatch = query.match(/(\d+)/)
+        const threshold = numberMatch ? numberMatch[1] : '85'
+        kqlQuery += `\n| where batteryHealth < ${threshold}`
+        explanation += ` with battery health below ${threshold}%`
+      }
+    }
+
+    // Temperature conditions
+    if (query.includes('temperature') || query.includes('hot') || query.includes('cold')) {
+      if (query.includes('high') || query.includes('hot') || query.includes('above')) {
+        kqlQuery += '\n| where temperature > 35'
+        explanation += ' with high temperatures'
+      } else if (query.includes('low') || query.includes('cold') || query.includes('below')) {
+        kqlQuery += '\n| where temperature < 5'
+        explanation += ' with low temperatures'
+      }
+    }
+
+    // Aggregations
+    if (query.includes('average') || query.includes('avg')) {
+      if (query.includes('voltage')) {
+        kqlQuery += '\n| summarize avg(voltage) by vesselName'
+        explanation += ', showing average voltage by vessel'
+        suggestedVisualizations.push('bar')
+      } else if (query.includes('temperature')) {
+        kqlQuery += '\n| summarize avg(temperature) by vesselName'
+        explanation += ', showing average temperature by vessel'
+        suggestedVisualizations.push('bar')
+      }
+    }
+
+    // Maintenance queries
+    if (query.includes('maintenance')) {
+      kqlQuery = 'VesselMaintenance'
+      explanation = 'Query vessel maintenance records'
+      
+      if (query.includes('pending') || query.includes('scheduled')) {
+        kqlQuery += '\n| where status == "pending"'
+        explanation += ' for pending maintenance'
+      } else if (query.includes('emergency') || query.includes('critical')) {
+        kqlQuery += '\n| where priority == "critical" or maintenanceType == "emergency"'
+        explanation += ' for critical or emergency maintenance'
+      }
+    }
+
+    // Weather queries
+    if (query.includes('weather') || query.includes('wind') || query.includes('wave')) {
+      kqlQuery = 'WeatherData'
+      explanation = 'Query weather data'
+      
+      if (query.includes('storm') || query.includes('rough')) {
+        kqlQuery += '\n| where windSpeed > 25 or waveHeight > 3'
+        explanation += ' for stormy conditions'
+      }
+    }
+
+    // Events and alerts
+    if (query.includes('alert') || query.includes('event') || query.includes('problem')) {
+      kqlQuery = 'AlertsAndEvents'
+      explanation = 'Query system alerts and events'
+      
+      if (query.includes('unresolved') || query.includes('open')) {
+        kqlQuery += '\n| where not resolved'
+        explanation += ' for unresolved issues'
+      } else if (query.includes('critical') || query.includes('high')) {
+        kqlQuery += '\n| where severity in ("high", "critical")'
+        explanation += ' for high-severity issues'
+      }
+    }
+
+    // Add common projections and limits
+    if (!kqlQuery.includes('summarize')) {
+      kqlQuery += '\n| project timestamp, vesselName, vesselId'
+      if (kqlQuery.startsWith('BatteryReadings')) {
+        kqlQuery = kqlQuery.replace('| project timestamp, vesselName, vesselId', 
+          '| project timestamp, vesselName, voltage, current, temperature, stateOfCharge, batteryHealth')
+      }
+    }
+    
+    kqlQuery += '\n| top 100 by timestamp desc'
+
+    return {
+      kqlQuery,
+      explanation,
+      confidence: 0.7, // Lower confidence for pattern-based generation
+      suggestedVisualizations
     }
   }
 
@@ -179,14 +309,16 @@ Only return valid JSON, no additional text.`
       const sampleVessel = vessels.find(v => v.vesselType === 'cargo') || vessels[0]
       
       return [
-        `Show battery voltage trends for ${sampleVessel.vesselName} over the last 24 hours`,
-        'Which vessels have battery health below 85%?',
-        'Compare charging patterns between cargo and passenger vessels',
-        'Show temperature anomalies in battery systems this week',
-        'What is the average state of charge across the fleet?',
-        `Display power consumption for ${sampleVessel.vesselType} vessels`,
-        'Find vessels with frequent battery faults',
-        'Show daily battery usage patterns'
+        'Show battery data from the last 24 hours',
+        'Which vessels have low battery health?',
+        'Show average voltage by vessel',
+        'Display temperature anomalies in battery systems',
+        'What maintenance is pending?',
+        'Show critical alerts that are unresolved',
+        'Display weather data for stormy conditions',
+        `Show battery data for vessel ${sampleVessel?.vesselName || 'Atlantic'}`,
+        'Show average temperature by vessel',
+        'Find emergency maintenance records'
       ]
     }
 
