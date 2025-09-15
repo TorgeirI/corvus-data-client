@@ -37,7 +37,16 @@
       "Bash(claude)",
       "Bash(npm install:*)",
       "Bash(killall:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "WebSearch",
+      "Bash(brew install:*)",
+      "Bash(mkcert:*)",
+      "Bash(python3:*)",
+      "Bash(npm run teams:package:*)",
+      "Bash(cat:*)",
+      "Bash(ngrok:*)",
+      "Bash(lt:*)",
+      "Bash(cloudflared tunnel:*)"
     ],
     "deny": []
   }

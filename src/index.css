@@ -332,3 +332,85 @@ body {
   background: var(--color-primary-200);
   color: var(--color-primary-900);
 }
+
+/* Microsoft Teams Theme Support */
+.teams-theme-default {
+  /* Default Teams theme - use existing variables */
+}
+
+.teams-theme-dark {
+  /* Dark Teams theme */
+  --color-background-primary: #1f1f1f;
+  --color-background-secondary: #2d2d30;
+  --color-background-tertiary: #3e3e42;
+  --color-surface: #252529;
+  --color-surface-elevated: #2d2d30;
+  
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #cccccc;
+  --color-text-tertiary: #999999;
+  
+  --color-border-primary: #414141;
+  --color-border-secondary: #525252;
+  
+  --color-neutral-50: #3e3e42;
+  --color-neutral-100: #525252;
+  --color-neutral-200: #666666;
+  --color-neutral-300: #808080;
+  --color-neutral-400: #999999;
+  --color-neutral-500: #cccccc;
+}
+
+.teams-theme-contrast {
+  /* High contrast Teams theme */
+  --color-background-primary: #000000;
+  --color-background-secondary: #1a1a1a;
+  --color-background-tertiary: #333333;
+  --color-surface: #1a1a1a;
+  --color-surface-elevated: #333333;
+  
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #ffffff;
+  --color-text-tertiary: #cccccc;
+  
+  --color-border-primary: #666666;
+  --color-border-secondary: #999999;
+  
+  --color-primary-600: #ffff00;
+  --color-primary-700: #cccc00;
+}
+
+/* Teams-specific adjustments */
+.in-teams .app-header {
+  /* Reduce header padding when in Teams */
+  padding: var(--spacing-4) var(--spacing-6);
+}
+
+.in-teams .app-main {
+  /* Adjust main content padding for Teams container */
+  padding: var(--spacing-4);
+}
+
+.browser-mode {
+  /* Styles when running in browser (not in Teams) */
+}
+
+/* Mobile responsiveness for Teams */
+@media (max-width: 768px) {
+  .in-teams .app-header {
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+  
+  .in-teams .app-main {
+    padding: var(--spacing-3);
+  }
+  
+  .teams-indicator {
+    font-size: var(--text-xs);
+    padding: var(--spacing-1) var(--spacing-2);
+  }
+  
+  .user-name {
+    display: none; /* Hide user name on small screens */
+  }
+}

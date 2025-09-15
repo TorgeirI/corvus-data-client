@@ -8,7 +8,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "teams:package": "node scripts/package-teams-app.js",
+    "teams:build": "npm run build && npm run teams:package"
   },
   "dependencies": {
     "@microsoft/teams-js": "^2.19.0",
