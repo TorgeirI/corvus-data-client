@@ -62,7 +62,7 @@ class AuthService {
     this.accessToken = null
   }
 
-  async getAccessToken(scopes: string[] = []): Promise<string | null> {
+  async getAccessToken(_scopes: string[] = []): Promise<string | null> {
     if (this.isMockMode) {
       return this.accessToken
     }

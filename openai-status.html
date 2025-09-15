@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Configuration Status</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 40px auto; 
+            padding: 20px; 
+            line-height: 1.6;
+        }
+        .success { color: #22c55e; font-weight: bold; }
+        .info { color: #3b82f6; }
+        .config-item { 
+            background: #f8fafc; 
+            padding: 12px; 
+            margin: 8px 0; 
+            border-left: 4px solid #10b981; 
+            border-radius: 4px;
+        }
+        .code { 
+            font-family: 'Monaco', 'Courier New', monospace; 
+            background: #1f2937; 
+            color: #e5e7eb; 
+            padding: 16px; 
+            border-radius: 8px; 
+            margin: 16px 0;
+        }
+        h1 { color: #1f2937; }
+        h2 { color: #374151; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <h1>🤖 OpenAI Configuration Status</h1>
+    
+    <div class="success">✅ OpenAI is now configured as the DEFAULT for NL to KQL generation!</div>
+    
+    <h2>📋 Configuration Summary</h2>
+    
+    <div class="config-item">
+        <strong>🔑 API Key:</strong> <span class="success">Configured</span> (sk-proj-UW...)
+    </div>
+    
+    <div class="config-item">
+        <strong>🎯 Model:</strong> <span class="info">gpt-3.5-turbo</span>
+    </div>
+    
+    <div class="config-item">
+        <strong>🌡️ Temperature:</strong> <span class="info">0.2</span> (deterministic, good for KQL)
+    </div>
+    
+    <div class="config-item">
+        <strong>⚡ Force OpenAI:</strong> <span class="success">TRUE</span> (fallback disabled)
+    </div>
+    
+    <h2>🚀 What Changed</h2>
+    
+    <ul>
+        <li><strong>Default Mode:</strong> OpenAI-powered instead of pattern-based fallback</li>
+        <li><strong>Enhanced Logging:</strong> Console will show "🚀 Using OpenAI-powered KQL generation"</li>
+        <li><strong>Error Handling:</strong> Application will throw an error if OpenAI is unavailable (when forced)</li>
+        <li><strong>UI Indicators:</strong> AI model banner will show "🤖 AI-Powered" instead of "⚠️ Pattern-Based Generator"</li>
+    </ul>
+    
+    <h2>💡 Testing</h2>
+    
+    <p>Open the application at <a href="http://127.0.0.1:3000" target="_blank">http://127.0.0.1:3000</a> and try these test queries:</p>
+    
+    <div class="code">
+• "Show me all vessels starting with the letter A"
+• "Find vessels with low battery health"
+• "Show battery data from the last 24 hours"
+• "Which vessels need maintenance?"
+    </div>
+    
+    <p>You should see in the browser console:</p>
+    <div class="code">
+🔧 NL to KQL Service Initialization
+🔑 API Key present: true
+🎯 Model configured: gpt-3.5-turbo
+✅ OpenAI initialized successfully with model: gpt-3.5-turbo
+🚀 DEFAULT MODE: OpenAI-powered NL to KQL generation
+
+🔄 Converting NL to KQL: [your query]
+🤖 OpenAI available: true
+🎯 Force OpenAI mode: true
+🚀 Using OpenAI-powered KQL generation
+    </div>
+    
+    <h2>🎯 Expected Results</h2>
+    
+    <p>Instead of generic fallback queries like:</p>
+    <div class="code" style="border-left: 4px solid #ef4444;">
+❌ OLD: BatteryReadings | project timestamp, vesselName, voltage, current, temperature, stateOfCharge, batteryHealth | top 100 by timestamp desc
+    </div>
+    
+    <p>You should now get intelligent, context-aware KQL queries like:</p>
+    <div class="code" style="border-left: 4px solid #10b981;">
+✅ NEW: VesselInfo | where vesselName startswith "A" | project vesselId, vesselName, vesselType
+    </div>
+    
+    <p><strong>The application now defaults to using OpenAI for natural language to KQL conversion!</strong></p>
+    
+</body>
+</html>

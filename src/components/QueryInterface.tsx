@@ -30,10 +30,17 @@ const QueryInterface = () => {
   const [suggestedQueries, setSuggestedQueries] = useState<string[]>([])
   const [showConfig, setShowConfig] = useState(false)
   const [showSavedQueries, setShowSavedQueries] = useState(false)
+  const [modelInfo, setModelInfo] = useState<{ model: string | null; usingFallback: boolean }>({ model: null, usingFallback: true })
 
   useEffect(() => {
     initializeApp()
+    loadModelInfo()
   }, [])
+
+  const loadModelInfo = () => {
+    const info = nlToKqlService.getModelInfo()
+    setModelInfo(info)
+  }
 
   const initializeApp = async () => {
     try {
@@ -199,6 +206,38 @@ const QueryInterface = () => {
         </div>
       )}
       
+      {/* AI Model Indicator */}
+      <div className={`ai-model-indicator ${modelInfo.usingFallback ? 'fallback' : 'ai-powered'}`}>
+        <div className="model-status">
+          {modelInfo.usingFallback ? (
+            <>
+              <span className="model-icon">⚠️</span>
+              <span className="model-info">
+                <strong>Pattern-Based Generator</strong>
+                <span className="model-detail">Using fallback KQL generation</span>
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="model-icon">🤖</span>
+              <span className="model-info">
+                <strong>AI-Powered</strong>
+                <span className="model-detail">Using {modelInfo.model}</span>
+              </span>
+            </>
+          )}
+        </div>
+        {modelInfo.usingFallback && (
+          <button 
+            className="config-ai-button"
+            onClick={() => setShowConfig(true)}
+            title="Configure OpenAI API key"
+          >
+            🔧 Configure AI
+          </button>
+        )}
+      </div>
+      
       <div className="query-section">
         <div className="query-header">
           <label htmlFor="natural-query">Ask a question about your data:</label>
@@ -267,7 +306,10 @@ const QueryInterface = () => {
           <pre className="kql-query">{currentKQL}</pre>
           <p className="query-explanation">{kqlConversion.explanation}</p>
           <div className="confidence-indicator">
-            Confidence: {Math.round(kqlConversion.confidence * 100)}%
+            <span>Confidence: {Math.round(kqlConversion.confidence * 100)}%</span>
+            <span className="generation-method">
+              {modelInfo.usingFallback ? '⚠️ Pattern-based' : '🤖 AI-generated'}
+            </span>
           </div>
         </div>
       )}

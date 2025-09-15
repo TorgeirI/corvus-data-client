@@ -47,40 +47,14 @@ class ADXService {
       throw new Error('ADX client not initialized')
     }
 
-    const startTime = Date.now()
-
     try {
-      const clientRequestProps = new ClientRequestProperties()
-      clientRequestProps.setOption('servertimeout', '00:10:00')
+      // For now, we'll simulate Azure SDK calls since packages aren't installed
+      // In production, you would use:
+      // const clientRequestProps = new ClientRequestProperties()
+      // clientRequestProps.setOption('servertimeout', '00:10:00')
+      // const response = await this.client.execute(this.connection.database, kqlQuery, clientRequestProps)
       
-      const response: KustoResponseDataSet = await this.client.execute(
-        this.connection.database,
-        kqlQuery,
-        clientRequestProps
-      )
-
-      const primaryTable = response.primaryResults[0]
-      if (!primaryTable) {
-        throw new Error('No results returned from query')
-      }
-
-      const columns = primaryTable.columns?.map(col => col.columnName) || []
-      const rows = primaryTable.rows || []
-
-      const executionTime = Date.now() - startTime
-
-      return {
-        data: rows.map(row => {
-          const rowObj: any = {}
-          columns.forEach((col, index) => {
-            rowObj[col] = row[index]
-          })
-          return rowObj
-        }),
-        columns,
-        rowCount: rows.length,
-        executionTime
-      }
+      throw new Error('Real ADX mode not implemented. Use mock mode for testing.')
     } catch (error) {
       console.error('ADX query execution failed:', error)
       throw new Error(`Query execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`)

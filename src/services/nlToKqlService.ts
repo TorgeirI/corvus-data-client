@@ -19,16 +19,41 @@ class NLToKQLService {
   private schemaContext: SchemaContext | null = null
 
   constructor() {
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY
+    // Azure OpenAI configuration
+    const azureEndpoint = import.meta.env.VITE_AZURE_OPENAI_ENDPOINT
+    const azureApiKey = import.meta.env.VITE_AZURE_OPENAI_API_KEY
+    const azureModel = import.meta.env.VITE_AZURE_OPENAI_MODEL || 'gpt-35-turbo'
+    const azureApiVersion = import.meta.env.VITE_AZURE_OPENAI_API_VERSION || '2024-02-01'
     
-    // Only initialize OpenAI if we have a real API key (not placeholder)
-    if (apiKey && apiKey !== 'your-openai-api-key-here') {
+    console.log('🔧 NL to KQL Service Initialization (Azure OpenAI)')
+    console.log('🔑 Azure API Key present:', !!azureApiKey)
+    console.log('🌐 Azure Endpoint configured:', !!azureEndpoint)
+    console.log('🎯 Model deployment:', azureModel)
+    console.log('📅 API Version:', azureApiVersion)
+    
+    // Initialize Azure OpenAI if configuration is present
+    if (azureEndpoint && azureApiKey && 
+        azureApiKey !== 'your-azure-openai-api-key-here' && 
+        azureEndpoint !== 'https://your-resource.openai.azure.com/') {
+      
       this.openai = new OpenAI({
-        apiKey,
+        apiKey: azureApiKey,
+        baseURL: `${azureEndpoint.replace(/\/$/, '')}/openai/deployments/${azureModel}`,
+        defaultQuery: { 'api-version': azureApiVersion },
+        defaultHeaders: {
+          'api-key': azureApiKey,
+        },
         dangerouslyAllowBrowser: true
       })
+      
+      console.log('✅ Azure OpenAI initialized successfully')
+      console.log('🔑 Azure API Key configured:', azureApiKey.substring(0, 10) + '...')
+      console.log('🌐 Endpoint:', azureEndpoint.substring(0, 30) + '...')
+      console.log('🚀 DEFAULT MODE: Azure OpenAI-powered NL to KQL generation')
     } else {
-      console.warn('OpenAI API key not configured. Using fallback KQL generation for testing.')
+      console.warn('❌ Azure OpenAI not configured or invalid. Using fallback KQL generation.')
+      console.warn('Required: VITE_AZURE_OPENAI_ENDPOINT and VITE_AZURE_OPENAI_API_KEY')
+      console.warn('⚠️ FALLBACK MODE: Pattern-based KQL generation')
       this.openai = null as any // Will use fallback methods
     }
   }
@@ -103,49 +128,84 @@ ${additionalContext}
       await this.loadSchemaContext()
     }
 
-    // If OpenAI is not available, use fallback method
+    console.log('🔄 Converting NL to KQL:', naturalLanguageQuery)
+    console.log('🤖 OpenAI available:', !!this.openai)
+
+    const forceOpenAI = import.meta.env.VITE_FORCE_OPENAI === 'true' || true // Force enabled for testing
+    console.log('🎯 Force OpenAI mode:', forceOpenAI)
+
+    // If Azure OpenAI is not available, use fallback method (unless forced)
     if (!this.openai) {
+      if (forceOpenAI) {
+        throw new Error('Azure OpenAI is required but not properly configured. Please check your Azure OpenAI endpoint and API key in .env.local')
+      }
+      console.log('⚠️ Using fallback KQL generation')
       return this.generateFallbackKQL(naturalLanguageQuery)
     }
 
-    const systemPrompt = `You are an expert in Kusto Query Language (KQL) for Azure Data Explorer. 
-Your task is to convert natural language queries into valid KQL queries.
+    console.log('🚀 Using Azure OpenAI-powered KQL generation')
+
+    const systemPrompt = `You are an expert in Kusto Query Language (KQL) for Azure Data Explorer, specializing in maritime vessel battery monitoring systems.
 
 Database Schema:
 ${this.buildSchemaPrompt()}
 
-Guidelines:
-1. Generate syntactically correct KQL queries
-2. Use appropriate table and column names from the schema
-3. Include proper time range filters when dealing with time-based data
-4. Use summarize, where, project, and other KQL operators appropriately
-5. Consider performance optimizations
-6. Suggest appropriate visualization types based on the query results
+Key Guidelines:
+1. Generate syntactically correct KQL queries using proper operators (|, where, project, summarize, etc.)
+2. Use EXACT table and column names from the schema provided above
+3. For vessel queries, use VesselInfo table first, then join or filter other tables
+4. For battery data, use BatteryReadings table with proper vesselId/vesselName filters
+5. For time-based queries, use appropriate time operators (ago(), startofday(), bin())
+6. Use string matching carefully: 'contains', 'startswith', 'endswith', 'matches regex'
+7. When filtering by letter/character patterns, use appropriate string functions
+
+Common Query Patterns:
+- Vessel filtering: VesselInfo | where vesselName startswith "A" | project vesselId, vesselName, vesselType
+- Battery data: BatteryReadings | where vesselName contains "Atlantic" | where timestamp >= ago(1d)
+- Health issues: BatteryReadings | where batteryHealth < 80 | summarize count() by vesselName
+- Maintenance: VesselMaintenance | where status == "pending" | project vesselName, component, priority
 
 Return your response as a JSON object with:
-- kqlQuery: The generated KQL query
-- explanation: Brief explanation of what the query does
+- kqlQuery: The complete, executable KQL query
+- explanation: Brief explanation of what the query does and returns
 - confidence: Your confidence level (0-1) in the query correctness
-- suggestedVisualizations: Array of suggested chart types (line, bar, pie, table, etc.)
+- suggestedVisualizations: Array of suggested chart types (table, bar, line, pie, etc.)
 
-Only return valid JSON, no additional text.`
+CRITICAL: Only return valid JSON, no markdown, no additional text. The response must be parseable JSON.`
 
     const userPrompt = `Convert this natural language query to KQL: "${naturalLanguageQuery}"`
 
     try {
-      const response = await this.openai.chat.completions.create({
-        model: import.meta.env.VITE_OPENAI_MODEL || 'gpt-4-turbo-preview',
+      const model = import.meta.env.VITE_AZURE_OPENAI_MODEL || 'gpt-35-turbo'
+      console.log(`🤖 Making Azure OpenAI API call with deployment: ${model}`)
+      console.log(`📝 Query: "${naturalLanguageQuery}"`)
+      
+      // Check if we're using o1-mini model (which has different parameter requirements)
+      const isO1Model = model.toLowerCase().includes('o1') || model.toLowerCase().includes('o4')
+      
+      const requestParams: any = {
+        model, // This is actually the deployment name for Azure OpenAI
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
-        ],
-        temperature: 0.3,
-        max_tokens: 1000
-      })
+        ]
+      }
+      
+      if (isO1Model) {
+        // o1 models don't support temperature, system messages, or response_format
+        requestParams.messages = [{ role: 'user', content: `${systemPrompt}\n\n${userPrompt}` }]
+        requestParams.max_completion_tokens = 1500
+      } else {
+        requestParams.temperature = Number(import.meta.env.VITE_OPENAI_TEMPERATURE) || 0.2
+        requestParams.max_tokens = 1500
+        requestParams.response_format = { type: "json_object" }
+      }
+      
+      const response = await this.openai.chat.completions.create(requestParams)
 
       const content = response.choices[0]?.message?.content
       if (!content) {
-        throw new Error('No response from OpenAI')
+        throw new Error('No response from Azure OpenAI')
       }
 
       try {
@@ -155,14 +215,18 @@ Only return valid JSON, no additional text.`
           throw new Error('Invalid response format from OpenAI')
         }
 
+        console.log('✅ Azure OpenAI response parsed successfully')
+        console.log('📊 Generated KQL:', result.kqlQuery.split('\n')[0] + '...')
+        console.log('🎯 Confidence:', result.confidence)
+        
         return result
       } catch (parseError) {
-        console.error('Failed to parse OpenAI response:', content)
-        throw new Error('Failed to parse AI response')
+        console.error('❌ Failed to parse Azure OpenAI response:', content)
+        throw new Error('Failed to parse Azure OpenAI response')
       }
     } catch (error) {
-      console.error('OpenAI API call failed:', error)
-      // Fall back to pattern-based generation if OpenAI fails
+      console.error('Azure OpenAI API call failed:', error)
+      // Fall back to pattern-based generation if Azure OpenAI fails
       return this.generateFallbackKQL(naturalLanguageQuery)
     }
   }
@@ -331,7 +395,7 @@ Only return valid JSON, no additional text.`
       'Group the data by category and show totals'
     ]
 
-    if (this.schemaContext.tables.length > 0) {
+    if (this.schemaContext && this.schemaContext.tables.length > 0) {
       const table = this.schemaContext.tables[0]
       return sampleQueries.map(query => 
         query.replace('first table', table).replace('the data', `data from ${table}`)
@@ -343,6 +407,16 @@ Only return valid JSON, no additional text.`
 
   getSchemaContext(): SchemaContext | null {
     return this.schemaContext
+  }
+
+  getModelInfo(): { model: string | null; usingFallback: boolean } {
+    const isAzureOpenAIAvailable = !!this.openai
+    const model = isAzureOpenAIAvailable ? (import.meta.env.VITE_AZURE_OPENAI_MODEL || 'gpt-35-turbo') : null
+    
+    return {
+      model,
+      usingFallback: !isAzureOpenAIAvailable
+    }
   }
 
   // Helper method to generate sample KQL queries for testing
