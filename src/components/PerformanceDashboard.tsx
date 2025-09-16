@@ -28,12 +28,12 @@ const PerformanceDashboard = ({ isOpen, onClose }: PerformanceDashboardProps) =>
     return `${(ms / 1000).toFixed(2)}s`
   }
 
-  const formatBytes = (bytes: number): string => {
-    if (bytes === 0) return '0 B'
-    const sizes = ['B', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(1024))
-    return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${sizes[i]}`
-  }
+  // const formatBytes = (bytes: number): string => {
+  //   if (bytes === 0) return '0 B'
+  //   const sizes = ['B', 'KB', 'MB', 'GB']
+  //   const i = Math.floor(Math.log(bytes) / Math.log(1024))
+  //   return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${sizes[i]}`
+  // }
 
   const getPerformanceColor = (duration: number, average: number): string => {
     if (duration < average * 0.5) return '#10b981' // Fast - green

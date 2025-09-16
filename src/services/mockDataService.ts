@@ -480,7 +480,7 @@ class MockDataService {
     return baseCurrent * operationalIntensity * (0.5 + Math.random())
   }
 
-  private generateTemperature(timestamp: Date, vessel: VesselInfo, operationalIntensity: number): number {
+  private generateTemperature(timestamp: Date, _vessel: VesselInfo, operationalIntensity: number): number {
     const month = timestamp.getMonth()
     const seasonalTemp = 10 + 15 * Math.sin((month - 3) * Math.PI / 6) // Seasonal variation
     const operationalHeat = operationalIntensity * 20 // Higher operation = more heat
@@ -558,10 +558,6 @@ class MockDataService {
     return Math.min(1, Math.max(0, intensity))
   }
 
-  private getSeasonFactor(timestamp: Date): number {
-    const month = timestamp.getMonth()
-    return 0.8 + 0.4 * Math.sin((month - 3) * Math.PI / 6)
-  }
 
   private determineChargingStatus(current: number, stateOfCharge: number): 'charging' | 'discharging' | 'idle' | 'fault' {
     if (Math.random() < 0.02) return 'fault' // 2% chance of fault
@@ -991,7 +987,7 @@ class MockDataService {
     // Handle CONTAINS/HAS conditions
     const containsMatch = condition.match(/(\w+)\s+(contains|has)\s+["']([^"']+)["']/i)
     if (containsMatch) {
-      const [, field, operator, value] = containsMatch
+      const [, field, _operator, value] = containsMatch
       const fieldValue = String(row[field]).toLowerCase()
       return fieldValue.includes(value.toLowerCase())
     }
@@ -1474,7 +1470,7 @@ class MockDataService {
     // For standalone bin operation, we'll add the binned column to each row
     const binMatch = expression.match(/bin\(([^,]+),\s*([^)]+)\)/)
     if (binMatch) {
-      const [, field, interval] = binMatch
+      const [, field, _interval] = binMatch
       const binColumnName = `bin_${field}`
       
       return data.map(row => ({
@@ -1652,7 +1648,7 @@ class MockDataService {
     return allData.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
   }
 
-  async simulateQuery(query: string): Promise<BatteryReading[]> {
+  async simulateQuery(_query: string): Promise<BatteryReading[]> {
     // Simple query simulation - in a real implementation, this would parse KQL
     const now = new Date()
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)

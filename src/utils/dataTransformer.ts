@@ -297,7 +297,6 @@ export function analyzeDataStructure(data: any[], columns: string[]) {
     }
   }
 
-  const sample = data[0]
   const numericColumns = columns.filter(col => 
     data.some(row => typeof row[col] === 'number')
   )

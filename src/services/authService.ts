@@ -1,5 +1,3 @@
-import { app } from '@microsoft/teams-js'
-
 export interface AuthContextType {
   isAuthenticated: boolean
   account: any | null
