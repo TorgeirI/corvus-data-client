@@ -1,14 +1,14 @@
 {
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
   "manifestVersion": "1.16",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "id": "f4e8c9d2-1a3b-4c5d-6e7f-8a9b0c1d2e3f",
   "packageName": "com.corvus.adx-query",
   "developer": {
     "name": "Corvus Data Solutions",
-    "websiteUrl": "https://mango-coast-06fecce03.2.azurestaticapps.net",
-    "privacyUrl": "https://mango-coast-06fecce03.2.azurestaticapps.net",
-    "termsOfUseUrl": "https://mango-coast-06fecce03.2.azurestaticapps.net"
+    "websiteUrl": "https://corvus-fixed.loca.lt",
+    "privacyUrl": "https://corvus-fixed.loca.lt",
+    "termsOfUseUrl": "https://corvus-fixed.loca.lt"
   },
   "icons": {
     "color": "color.png",
@@ -27,8 +27,8 @@
     {
       "entityId": "corvus-adx-tab",
       "name": "ADX Query",
-      "contentUrl": "https://mango-coast-06fecce03.2.azurestaticapps.net",
-      "websiteUrl": "https://mango-coast-06fecce03.2.azurestaticapps.net",
+      "contentUrl": "https://corvus-fixed.loca.lt",
+      "websiteUrl": "https://corvus-fixed.loca.lt",
       "scopes": ["personal"]
     }
   ],
@@ -37,6 +37,6 @@
     "messageTeamMembers"
   ],
   "validDomains": [
-    "mango-coast-06fecce03.2.azurestaticapps.net"
+    "corvus-fixed.loca.lt"
   ]
 }
