@@ -38,6 +38,7 @@ jobs:
       - name: Build application
         run: npm run build
         env:
+          VITE_USE_MOCK_DATA: true
           VITE_OPENAI_API_KEY: ${{ secrets.VITE_OPENAI_API_KEY }}
           VITE_OPENAI_MODEL: ${{ secrets.VITE_OPENAI_MODEL }}
           VITE_OPENAI_TEMPERATURE: ${{ secrets.VITE_OPENAI_TEMPERATURE }}
