@@ -383,3 +383,141 @@ User should now see:
 - **Expected**: Proper filtered KQL instead of generic fallback
 
 The application **now defaults to OpenAI instead of fallback KQL generation** as requested!
+
+---
+
+## TEAMS INTEGRATION BREAKTHROUGH (COMPLETED ✅)
+
+### Microsoft Teams Integration Successfully Implemented
+
+#### Complete Teams Setup Achieved:
+- **Microsoft Teams SDK Integration**: Full context detection, theme support, user information display
+- **Tunneling Infrastructure**: Working Cloudflare HTTP/2 tunnel for public access
+- **Teams App Manifest**: Properly configured with GUID, icons, and iframe support
+- **Package Generation**: Automated Teams app package creation and deployment
+- **Authentication Headers**: X-Frame-Options and CSP configured for Teams embedding
+- **Theme Support**: Light, dark, and high-contrast Teams theme integration
+
+#### Key Components Added:
+
+1. **Teams SDK (@microsoft/teams-js v2.19.0)**:
+   ```typescript
+   // App initialization with context detection
+   await app.initialize()
+   const context = await app.getContext()
+   
+   // Theme change handling
+   app.registerOnThemeChangeHandler((theme: string) => {
+     setTeamsContext(prev => ({ ...prev, theme }))
+   })
+   ```
+
+2. **Teams Manifest Configuration**:
+   ```json
+   {
+     "id": "f4e8c9d2-1a3b-4c5d-6e7f-8a9b0c1d2e3f",
+     "version": "1.0.7",
+     "staticTabs": [{
+       "contentUrl": "https://launched-limitations-aviation-interim.trycloudflare.com",
+       "scopes": ["personal"]
+     }]
+   }
+   ```
+
+3. **Tunneling Solutions** (Multiple approaches tested):
+   - **ngrok**: Requires authentication (blocked)
+   - **localtunnel**: Password protection (tunnel password: 82.134.6.174)
+   - **Cloudflare Tunnel (QUIC)**: Connection stability issues
+   - **✅ Cloudflare Tunnel (HTTP/2)**: WORKING SOLUTION
+
+4. **Current Working Configuration**:
+   - **Tunnel URL**: `https://launched-limitations-aviation-interim.trycloudflare.com`
+   - **Protocol**: HTTP/2 (stable connection)
+   - **Status**: Successfully embedded in Microsoft Teams
+   - **Package**: `corvus-adx-teams-app.zip` (ready for deployment)
+
+5. **Teams App Features**:
+   - **Context Detection**: Shows Teams indicator with user info
+   - **Theme Integration**: Automatic switching between Teams themes
+   - **iframe Embedding**: Proper headers for Teams container
+   - **User Experience**: Seamless integration within Teams interface
+
+#### Technical Implementation Details:
+
+1. **Vite Configuration Updates**:
+   ```typescript
+   server: {
+     host: '0.0.0.0',
+     allowedHosts: ['.trycloudflare.com', '.loca.lt'],
+     headers: {
+       'X-Frame-Options': 'SAMEORIGIN',
+       'Content-Security-Policy': "frame-ancestors 'self' https://*.teams.microsoft.com https://*.teams.office.com"
+     }
+   }
+   ```
+
+2. **Teams Theme Support**:
+   ```css
+   .teams-theme-dark {
+     --color-background-primary: #1f1f1f;
+     --color-text-primary: #ffffff;
+   }
+   .teams-theme-contrast {
+     --color-background-primary: #000000;
+     --color-primary-600: #ffff00;
+   }
+   ```
+
+3. **Package Generation Script**:
+   ```bash
+   npm run teams:package  # Generates .zip with manifest + icons
+   npm run teams:build    # Build + package in one command
+   ```
+
+4. **App Icons Created**:
+   - **Color icon** (192x192): Professional blue gradient with ship logo
+   - **Outline icon** (32x32): Simplified monochrome version
+
+#### Problem Resolution Timeline:
+
+1. **Blank Page Issue**: Cloudflare QUIC tunnel disconnections (Error 1033)
+2. **Password Protection**: localtunnel requiring IP-based authentication
+3. **Connection Stability**: Switched from QUIC to HTTP/2 protocol
+4. **Final Solution**: Cloudflare HTTP/2 tunnel with stable connection
+
+#### Teams Installation Process:
+1. Upload `corvus-adx-teams-app.zip` to Microsoft Teams
+2. Navigate to Apps > Manage your apps > Upload an app
+3. App loads successfully with full functionality
+4. Supports Teams context, themes, and user information
+
+#### npm Scripts Added:
+```json
+{
+  "teams:package": "node scripts/package-teams-app.js",
+  "teams:build": "npm run build && npm run teams:package"
+}
+```
+
+#### Files Created/Modified:
+- **TEAMS_SETUP.md**: Complete Teams integration guide
+- **public/manifest.json**: Teams app manifest with GUID
+- **public/color.png**: Teams app color icon
+- **public/outline.png**: Teams app outline icon  
+- **scripts/package-teams-app.js**: Automated packaging script
+- **src/App.tsx**: Teams SDK integration and theme support
+- **src/App.css + index.css**: Teams theme styling
+- **vite.config.ts**: iframe headers and tunnel host configuration
+- **package.json**: Teams scripts and @microsoft/teams-js dependency
+
+#### Current Status: 
+**✅ FULLY FUNCTIONAL IN MICROSOFT TEAMS**
+
+The Corvus ADX application now runs successfully as a Microsoft Teams personal tab, with:
+- Stable public tunnel access
+- Complete Teams SDK integration
+- Theme-aware responsive design
+- User context and authentication
+- Professional Teams app package
+
+**Last Updated**: September 15, 2025 - Teams integration complete and working

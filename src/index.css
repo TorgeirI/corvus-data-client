@@ -16,47 +16,47 @@
   --color-primary-800: #1e40af;
   --color-primary-900: #1e3a8a;
   
-  --color-neutral-50: #f8fafc;
-  --color-neutral-100: #f1f5f9;
-  --color-neutral-200: #e2e8f0;
-  --color-neutral-300: #cbd5e1;
-  --color-neutral-400: #94a3b8;
-  --color-neutral-500: #64748b;
-  --color-neutral-600: #475569;
-  --color-neutral-700: #334155;
-  --color-neutral-800: #1e293b;
-  --color-neutral-900: #0f172a;
+  --color-neutral-50: #8b949e;
+  --color-neutral-100: #7d8590;
+  --color-neutral-200: #6e7681;
+  --color-neutral-300: #484f58;
+  --color-neutral-400: #30363d;
+  --color-neutral-500: #21262d;
+  --color-neutral-600: #161b22;
+  --color-neutral-700: #0d1117;
+  --color-neutral-800: #010409;
+  --color-neutral-900: #000000;
   
-  /* Surface Colors */
-  --color-background-primary: #ffffff;
-  --color-background-secondary: #f8fafc;
-  --color-background-tertiary: #f1f5f9;
-  --color-surface: #ffffff;
-  --color-surface-elevated: #ffffff;
+  /* Surface Colors - Dark Theme */
+  --color-background-primary: #0d1117;
+  --color-background-secondary: #161b22;
+  --color-background-tertiary: #21262d;
+  --color-surface: #161b22;
+  --color-surface-elevated: #21262d;
   
-  /* Status Colors */
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-info: #06b6d4;
+  /* Status Colors - Dark Theme Enhanced */
+  --color-success: #22c55e;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --color-info: #38bdf8;
   
-  /* Text Colors */
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
-  --color-text-tertiary: #64748b;
-  --color-text-inverse: #ffffff;
+  /* Text Colors - Dark Theme */
+  --color-text-primary: #f0f6fc;
+  --color-text-secondary: #c9d1d9;
+  --color-text-tertiary: #8b949e;
+  --color-text-inverse: #0d1117;
   
-  /* Border & Divider */
-  --color-border-primary: #e2e8f0;
-  --color-border-secondary: #cbd5e1;
-  --color-divider: #f1f5f9;
+  /* Border & Divider - Dark Theme */
+  --color-border-primary: #30363d;
+  --color-border-secondary: #21262d;
+  --color-divider: #21262d;
   
-  /* Shadows */
-  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  /* Shadows - Dark Theme */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.6), 0 8px 10px -6px rgb(0 0 0 / 0.6);
   
   /* Spacing Scale */
   --spacing-1: 0.25rem;   /* 4px */
@@ -327,15 +327,51 @@ body {
   background: var(--color-neutral-400);
 }
 
-/* Selection */
+/* Selection - Dark Theme */
 ::selection {
-  background: var(--color-primary-200);
-  color: var(--color-primary-900);
+  background: var(--color-primary-600);
+  color: #ffffff;
 }
 
 /* Microsoft Teams Theme Support */
 .teams-theme-default {
-  /* Default Teams theme - use existing variables */
+  /* Default Teams theme - keep current dark theme */
+}
+
+.teams-theme-light {
+  /* Light Teams theme override */
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f8fafc;
+  --color-background-tertiary: #f1f5f9;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #ffffff;
+  
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #64748b;
+  --color-text-inverse: #ffffff;
+  
+  --color-border-primary: #e2e8f0;
+  --color-border-secondary: #cbd5e1;
+  --color-divider: #f1f5f9;
+  
+  --color-neutral-50: #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+  
+  /* Light theme shadows */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
 .teams-theme-dark {

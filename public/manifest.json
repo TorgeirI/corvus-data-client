@@ -6,9 +6,9 @@
   "packageName": "com.corvus.adx-query",
   "developer": {
     "name": "Corvus Data Solutions",
-    "websiteUrl": "https://launched-limitations-aviation-interim.trycloudflare.com",
-    "privacyUrl": "https://launched-limitations-aviation-interim.trycloudflare.com",
-    "termsOfUseUrl": "https://launched-limitations-aviation-interim.trycloudflare.com"
+    "websiteUrl": "https://admissions-brad-mhz-releases.trycloudflare.com",
+    "privacyUrl": "https://admissions-brad-mhz-releases.trycloudflare.com",
+    "termsOfUseUrl": "https://admissions-brad-mhz-releases.trycloudflare.com"
   },
   "icons": {
     "color": "color.png",
@@ -27,8 +27,8 @@
     {
       "entityId": "corvus-adx-tab",
       "name": "ADX Query",
-      "contentUrl": "https://launched-limitations-aviation-interim.trycloudflare.com",
-      "websiteUrl": "https://launched-limitations-aviation-interim.trycloudflare.com",
+      "contentUrl": "https://admissions-brad-mhz-releases.trycloudflare.com",
+      "websiteUrl": "https://admissions-brad-mhz-releases.trycloudflare.com",
       "scopes": ["personal"]
     }
   ],
@@ -37,6 +37,6 @@
     "messageTeamMembers"
   ],
   "validDomains": [
-    "launched-limitations-aviation-interim.trycloudflare.com"
+    "admissions-brad-mhz-releases.trycloudflare.com"
   ]
 }
